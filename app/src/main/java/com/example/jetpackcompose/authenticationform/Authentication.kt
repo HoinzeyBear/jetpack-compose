@@ -1,15 +1,26 @@
 package com.example.jetpackcompose.authenticationform
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -40,10 +51,17 @@ fun AuthenticationContent(
             AuthenticationForm(
                 modifier = Modifier.fillMaxWidth() ,
                 authenticationState = authenticationState,
-                onEmailChanged = { email ->
+                onEmailChanged = {
                     handleEvent(
-                        AuthenticationViewModel.AuthenticationEvent.EmailChanged(email))
-                })
+                        AuthenticationViewModel.AuthenticationEvent.EmailChanged(it))
+                },
+            onPasswordChanged = {
+                handleEvent(
+                    AuthenticationViewModel.AuthenticationEvent.PasswordChanged(it))
+            },
+            onDoneClicked = {
+                handleEvent(AuthenticationViewModel.AuthenticationEvent.Authenticate)
+            })
 
         }
     }
@@ -51,22 +69,33 @@ fun AuthenticationContent(
 
 @Composable
 fun AuthenticationForm(modifier: Modifier = Modifier, authenticationState: AuthenticationState,
-                       onEmailChanged: (email: String) -> Unit) {
+                       onEmailChanged: (email: String) -> Unit,
+                       onPasswordChanged: (password: String) -> Unit,
+                        onDoneClicked: () -> Unit) {
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+        val passwordFocusRequester = FocusRequester()
         Spacer(modifier = Modifier.height(32.dp))
         AuthenticationTitle(authenticationMode = authenticationState.authenticationMode)
         Spacer(modifier = Modifier.height(32.dp))
         Card(modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 32.dp), elevation = 4.dp) {
+            .fillMaxWidth()
+            .padding(horizontal = 32.dp), elevation = 4.dp) {
             Column(modifier = Modifier.padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally) {
 
                 EmailInput(
                     modifier = Modifier.fillMaxWidth(),
                     email = authenticationState.email ?: "",
-                    onEmailChanged = onEmailChanged
-                )
+                    onEmailChanged = onEmailChanged,
+                    onNextClicked = {passwordFocusRequester.requestFocus()})
+                Spacer(modifier = Modifier.height(16.dp))
+                PasswordInput(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .focusRequester(passwordFocusRequester),
+                    password = authenticationState.password ?: "",
+                    onPasswordChanged = onPasswordChanged,
+                    onDoneClicked = onDoneClicked)
             }
         }
     }
@@ -91,7 +120,8 @@ fun AuthenticationTitle(
 fun EmailInput(
     modifier: Modifier = Modifier,
     email: String?,
-    onEmailChanged: (email: String) -> Unit
+    onEmailChanged: (email: String) -> Unit,
+    onNextClicked: () -> Unit
 ) {
     TextField(modifier = modifier,
         value = email ?: "",
@@ -103,8 +133,59 @@ fun EmailInput(
         singleLine = true,
         leadingIcon = {
             Icon(imageVector = Icons.Default.Email, contentDescription = null)
-        }
+        },
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Email,
+            imeAction = ImeAction.Next),
+        keyboardActions = KeyboardActions(
+            onNext = {onNextClicked()}
+        )
     )
 }
 
-//279
+@Composable
+fun PasswordInput(
+    modifier: Modifier = Modifier,
+    password: String,
+    onPasswordChanged: (email: String) -> Unit,
+    onDoneClicked: () -> Unit
+) {
+    var isPasswordHidden by remember {
+        mutableStateOf(true)
+    }
+
+    TextField(
+        modifier = modifier,
+        value = password,
+        onValueChange = {
+            onPasswordChanged(it)
+        },
+        singleLine = true,
+        label = {
+            Text(text = stringResource(
+                    id = R.string.label_password))
+        },
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Default.Lock,
+                contentDescription = null)
+        },
+        trailingIcon = {
+            Icon(
+                modifier = Modifier.clickable(onClickLabel = if (isPasswordHidden) {
+                        stringResource(id = R.string.cd_show_password)
+                    } else stringResource(id = R.string.cd_hide_password)) {
+                    isPasswordHidden = !isPasswordHidden
+                },
+                imageVector = if (isPasswordHidden) {
+                    Icons.Default.Phone
+                } else Icons.Default.Person,//missing Visibility & VisibilityOff options
+                contentDescription = null)
+        }, visualTransformation = if (isPasswordHidden) {
+            PasswordVisualTransformation()
+        } else VisualTransformation.None,
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done,
+        keyboardType = KeyboardType.Password),
+        keyboardActions = KeyboardActions(onDone = {onDoneClicked()})
+    )
+}
