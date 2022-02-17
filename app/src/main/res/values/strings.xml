@@ -4,6 +4,7 @@
     <string name="theme_light">Light</string>
     <string name="theme_system">System</string>
     <string name="go_back">Go back</string>
+    <!--  Settings  -->
     <string name="settings_title">Settings</string>
     <string name="notifications_enabled">Notifications Enabled</string>
     <string name="notifications_disabled">Notifications Disabled</string>
@@ -22,4 +23,11 @@
     <string name="select_theme">Select theme</string>
     <string name="setting_app_version_title">App Version</string>
     <string name="setting_app_version">v1.1</string>
+<!--  Auth  -->
+    <string name="password_requirement_characters">At least 8 characters</string>
+    <string name="password_requirement_capital">At least 1 upper-case letter</string>
+    <string name="password_requirement_digit">At least 1 digit</string>
+    <string name="label_sign_in_to_account">Sign In to your account</string>
+    <string name="label_sign_up_for_account">Sign Up for an account</string>
+    <string name="label_email">Email Address</string>
 </resources>

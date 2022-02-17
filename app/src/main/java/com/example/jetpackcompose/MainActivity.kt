@@ -1,10 +1,11 @@
-package com.example.jetpackcompose.settings
+package com.example.jetpackcompose
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import com.example.jetpackcompose.settings.Settings
 import com.example.jetpackcompose.ui.theme.JetpackComposeTheme
 
 class MainActivity : ComponentActivity() {
