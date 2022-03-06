@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import com.example.jetpackcompose.authenticationform.Authentication
 import com.example.jetpackcompose.settings.Settings
 import com.example.jetpackcompose.ui.theme.JetpackComposeTheme
 
@@ -15,7 +16,8 @@ class MainActivity : ComponentActivity() {
             JetpackComposeTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background) {
-                    Settings()
+//                    Settings()
+                    Authentication()
                 }
             }
         }
