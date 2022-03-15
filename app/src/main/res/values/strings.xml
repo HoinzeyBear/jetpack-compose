@@ -41,4 +41,11 @@
     <string name="action_already_have_account">Already have an account?</string>
     <string name="error_title">Whoops</string>
     <string name="error_action">OK</string>
+
+<!--Email inbox-->
+    <string name="title_inbox">Inbox (%s)</string>
+    <string name="message_content_error">Whoops, there was a problem loading the content</string>
+    <string name="label_try_again">Try again?</string>
+    <string name="message_empty_content">Nothing to show here yet.</string>
+    <string name="label_check_again">Check again</string>
 </resources>
