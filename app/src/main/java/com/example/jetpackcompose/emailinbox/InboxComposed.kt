@@ -1,16 +1,21 @@
 package com.example.jetpackcompose.emailinbox
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.CustomAccessibilityAction
@@ -25,7 +30,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.jetpackcompose.R
 
 @Composable
-fun inbox() {
+fun Inbox() {
     val viewModel: InboxViewModel = viewModel()
     MaterialTheme {
         EmailInbox(
@@ -77,19 +82,37 @@ fun EmailInbox(
 @Composable
 fun EmailList(
     modifier: Modifier = Modifier,
-    emails: List<EmailEntity>) {
+    emails: List<EmailEntity>,
+    inboxEventListener: (inboxEvent: InboxEvent) -> Unit) {
+
+    val deleteEmailLabel = stringResource(id = R.string.cd_delete_email)
 
     LazyColumn(modifier = modifier) {//todo fillMaxSize ?
         items(emails) { email ->
+            var isEmailItemDismissed by remember { mutableStateOf(false) }
+            val dismissState = rememberDismissState(confirmStateChange = {
+                if (it == DismissValue.DismissedToEnd) {
+                    isEmailItemDismissed = true
+                }
+                true
+            })
+            val emailHeightAnimation by animateDpAsState(
+                targetValue = if (isEmailItemDismissed.not()) 120.dp
+                    else 0.dp,
+                animationSpec = tween(delayMillis = 300),
+                finishedListener = {
+                    inboxEventListener(InboxEvent.DeleteEmail(email.id))
+                })
             SwipeToDismiss(
                 modifier = Modifier.semantics {
                     customActions = listOf(
                         CustomAccessibilityAction(deleteEmailLabel) {
-                            onEmailDeleted(email.id)
+                            inboxEventListener(InboxEvent.DeleteEmail(email.id))
                             true
-                        }
-                    )
-                }.testTag(Tags.TAG_EMAIL + email.id),
+                        })
+                }
+//                    .testTag(Tags.TAG_EMAIL + email.id)
+                ,
                 directions = setOf(
                     DismissDirection.StartToEnd
                 ),
@@ -101,8 +124,9 @@ fun EmailList(
                         modifier = Modifier
                             .height(emailHeightAnimation)
                             .fillMaxWidth(),
-                        targetValue = dismissState.targetValue,
-                        currentValue = dismissState.currentValue
+                        dismissState = dismissState,
+//                        targetValue = dismissState.targetValue,
+//                        currentValue = dismissState.currentValue
                     )
                 },
                 state = dismissState,
@@ -112,21 +136,43 @@ fun EmailList(
                             .height(emailHeightAnimation)
                             .fillMaxWidth(),
                         email = email,
-                        dismissDirection = dismissState.dismissDirection
+                        dismissState = dismissState,
+//                        dismissDirection = dismissState.dismissDirection
                     )
-                }
-            )
+                })
+
+            val dividerVisibilityAnimation by animateFloatAsState(
+                targetValue = if (dismissState.targetValue ==
+                    DismissValue.Default) {
+                    1f
+                } else 0f,
+                animationSpec = tween(delayMillis = 300))
+
+            Divider(
+                modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .alpha(dividerVisibilityAnimation))
+
         }
     }
 }
 
+@ExperimentalMaterialApi
 @Composable
 fun EmailItem(
     modifier: Modifier = Modifier,
-    email: EmailEntity
+    email: EmailEntity,
+    dismissState: DismissState
 ) {
+
+    val cardElevation = animateDpAsState(
+        if (dismissState.dismissDirection != null) {
+            4.dp
+        } else 0.dp
+    ).value
+
     Card(
-        modifier = modifier.padding(16.dp)
+        modifier = modifier.padding(16.dp), elevation = cardElevation
     ) {
         Column(modifier = Modifier.padding(16.dp).fillMaxWidth()) {
             Text(
@@ -144,12 +190,41 @@ fun EmailItem(
     }
 }
 
+@ExperimentalMaterialApi
 @Composable
 fun EmailItemBackground(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    dismissState: DismissState
 ) {
-    Box(modifier = modifier.padding(horizontal = 20.dp)) {
-        Icon(modifier = Modifier.align(Alignment.CenterStart) ,imageVector = Icons.Default.Delete, contentDescription = null)
+
+    val backgroundColor by animateColorAsState(
+        targetValue = when (dismissState.targetValue) {
+            DismissValue.DismissedToEnd ->
+                MaterialTheme.colors.error
+            else -> MaterialTheme.colors.background
+        },
+        animationSpec = tween())
+
+    val iconColor by animateColorAsState(
+        targetValue = when (dismissState.targetValue) {
+            DismissValue.DismissedToEnd ->
+                MaterialTheme.colors.onError
+            else -> MaterialTheme.colors.onSurface
+        },
+        animationSpec = tween())
+
+    val scale by animateFloatAsState(
+        targetValue = if (dismissState.targetValue ==
+            DismissValue.DismissedToEnd) {
+            1f
+        } else 0.75f
+    )
+
+    Box(modifier = modifier.padding(horizontal = 20.dp).background(backgroundColor)) {
+        if (dismissState.currentValue == DismissValue.Default) {
+            Icon(modifier = Modifier.align(Alignment.CenterStart).scale(scale),
+                tint = iconColor ,imageVector = Icons.Default.Delete, contentDescription = null)
+        }
     }
 }
 

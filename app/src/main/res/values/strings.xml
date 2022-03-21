@@ -48,4 +48,11 @@
     <string name="label_try_again">Try again?</string>
     <string name="message_empty_content">Nothing to show here yet.</string>
     <string name="label_check_again">Check again</string>
+    <string name="cd_delete_email">Delete Email</string>
+
+<!--Messaging-->
+    <string name="cd_close_conversation">Close conversation</string>
+    <string name="title_chat">Group Chat</string>
+    <string name="label_no_messages">No messages to display</string>
+
 </resources>
