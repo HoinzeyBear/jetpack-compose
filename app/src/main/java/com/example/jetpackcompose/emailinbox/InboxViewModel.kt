@@ -23,7 +23,9 @@ class InboxViewModel: ViewModel() {
     }
 
     private fun deleteEmail(id: String) {
-        val ogContent = uiState.value.content
-        uiState.value = uiState.value.copy(content = ogContent?.filter { it.id == id })
+        uiState.value = uiState.value.copy(
+            content = uiState.value.content?.filter {
+                it.id != id
+            })
     }
 }

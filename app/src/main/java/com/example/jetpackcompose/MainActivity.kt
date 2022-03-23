@@ -22,7 +22,7 @@ class MainActivity : ComponentActivity() {
                 Surface(color = MaterialTheme.colors.background) {
 //                    Settings()
 //                    Authentication()
-//                    Inbox()
+                    Inbox()
 //                    Messaging()
                 }
             }

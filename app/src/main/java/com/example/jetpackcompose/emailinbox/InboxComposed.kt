@@ -1,5 +1,6 @@
 package com.example.jetpackcompose.emailinbox
 
+import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -29,48 +30,64 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.jetpackcompose.R
 
+@ExperimentalMaterialApi
 @Composable
 fun Inbox() {
     val viewModel: InboxViewModel = viewModel()
     MaterialTheme {
         EmailInbox(
-            modifier = Modifier.fillMaxWidth() ,
+            modifier = Modifier.fillMaxWidth(),
             inboxState = viewModel.uiState.collectAsState().value,
-            inboxEventListener = viewModel::handleEvent)
+            inboxEventListener = viewModel::handleEvent
+        )
     }
     LaunchedEffect(Unit) {
         viewModel.loadContent()
     }
 }
 
+@ExperimentalMaterialApi
 @Composable
 fun EmailInbox(
     modifier: Modifier = Modifier,
     inboxState: InboxState,
-    inboxEventListener: (inboxEvent: InboxEvent) -> Unit) {
+    inboxEventListener: (inboxEvent: InboxEvent) -> Unit
+) {
 
     Scaffold(
         modifier = modifier,
         topBar = {
             TopAppBar(
                 backgroundColor = MaterialTheme.colors.surface,
-                elevation = 0.dp){
+                elevation = 0.dp
+            ) {
                 Text(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 8.dp),
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
-                    text = stringResource(id = R.string.title_inbox,
-                        inboxState.content!!.count()))
+                    text = stringResource(
+                        id = R.string.title_inbox,
+                        inboxState.content?.count() ?: "bug"
+                    )
+                )
             }
         }) {
-        Box(modifier = Modifier.fillMaxWidth(),
-        contentAlignment = Alignment.Center) {
-            if(inboxState.status == InboxStatus.LOADING) {
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+            if (inboxState.status == InboxStatus.LOADING) {
                 LoadingIndicator()
-            } else if(inboxState.status == InboxStatus.ERROR) {
+            } else if (inboxState.status == InboxStatus.ERROR) {
                 DisplayErrorState(modifier = modifier, inboxEventListener)
+            } else if (inboxState.status == InboxStatus.HAS_EMAILS) {
+                EmailList(
+                    modifier = Modifier.fillMaxSize(),
+                    emails = inboxState.content!!,
+                    inboxEventListener = inboxEventListener
+                )
             } else {
                 DisplayEmptyState(inboxEventListener = inboxEventListener)
             }
@@ -78,19 +95,22 @@ fun EmailInbox(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@ExperimentalMaterialApi
 @Composable
 fun EmailList(
     modifier: Modifier = Modifier,
     emails: List<EmailEntity>,
-    inboxEventListener: (inboxEvent: InboxEvent) -> Unit) {
+    inboxEventListener: (inboxEvent: InboxEvent) -> Unit
+) {
 
     val deleteEmailLabel = stringResource(id = R.string.cd_delete_email)
-
-    LazyColumn(modifier = modifier) {//todo fillMaxSize ?
-        items(emails) { email ->
+    //todo the swipe is removing the email but not all 5 are being redrawn. Step through the testing chapters to see what is up!
+    //todo i was missing the bloody key!!
+    LazyColumn(modifier = modifier) {
+        items(emails, key = { item -> item.id }) { email ->
             var isEmailItemDismissed by remember { mutableStateOf(false) }
-            val dismissState = rememberDismissState(confirmStateChange = {
+            val dismissState = rememberDismissState(
+                confirmStateChange = {
                 if (it == DismissValue.DismissedToEnd) {
                     isEmailItemDismissed = true
                 }
@@ -98,7 +118,7 @@ fun EmailList(
             })
             val emailHeightAnimation by animateDpAsState(
                 targetValue = if (isEmailItemDismissed.not()) 120.dp
-                    else 0.dp,
+                else 0.dp,
                 animationSpec = tween(delayMillis = 300),
                 finishedListener = {
                     inboxEventListener(InboxEvent.DeleteEmail(email.id))
@@ -143,15 +163,18 @@ fun EmailList(
 
             val dividerVisibilityAnimation by animateFloatAsState(
                 targetValue = if (dismissState.targetValue ==
-                    DismissValue.Default) {
+                    DismissValue.Default
+                ) {
                     1f
                 } else 0f,
-                animationSpec = tween(delayMillis = 300))
+                animationSpec = tween(delayMillis = 300)
+            )
 
             Divider(
                 modifier = Modifier
-                .padding(horizontal = 16.dp)
-                .alpha(dividerVisibilityAnimation))
+                    .padding(horizontal = 16.dp)
+                    .alpha(dividerVisibilityAnimation)
+            )
 
         }
     }
@@ -174,10 +197,15 @@ fun EmailItem(
     Card(
         modifier = modifier.padding(16.dp), elevation = cardElevation
     ) {
-        Column(modifier = Modifier.padding(16.dp).fillMaxWidth()) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
+        ) {
             Text(
                 text = email.title,
-                fontWeight = FontWeight.Bold)
+                fontWeight = FontWeight.Bold
+            )
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -185,7 +213,8 @@ fun EmailItem(
                 text = email.description,
                 fontSize = 14.sp,
                 maxLines = 2,
-                overflow = TextOverflow.Ellipsis)
+                overflow = TextOverflow.Ellipsis
+            )
         }
     }
 }
@@ -203,7 +232,8 @@ fun EmailItemBackground(
                 MaterialTheme.colors.error
             else -> MaterialTheme.colors.background
         },
-        animationSpec = tween())
+        animationSpec = tween()
+    )
 
     val iconColor by animateColorAsState(
         targetValue = when (dismissState.targetValue) {
@@ -211,19 +241,29 @@ fun EmailItemBackground(
                 MaterialTheme.colors.onError
             else -> MaterialTheme.colors.onSurface
         },
-        animationSpec = tween())
+        animationSpec = tween()
+    )
 
     val scale by animateFloatAsState(
         targetValue = if (dismissState.targetValue ==
-            DismissValue.DismissedToEnd) {
+            DismissValue.DismissedToEnd
+        ) {
             1f
         } else 0.75f
     )
 
-    Box(modifier = modifier.padding(horizontal = 20.dp).background(backgroundColor)) {
+    Box(
+        modifier = modifier
+            .padding(horizontal = 20.dp)
+            .background(backgroundColor)
+    ) {
         if (dismissState.currentValue == DismissValue.Default) {
-            Icon(modifier = Modifier.align(Alignment.CenterStart).scale(scale),
-                tint = iconColor ,imageVector = Icons.Default.Delete, contentDescription = null)
+            Icon(
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .scale(scale),
+                tint = iconColor, imageVector = Icons.Default.Delete, contentDescription = null
+            )
         }
     }
 }
