@@ -3,17 +3,15 @@ package com.example.jetpackcompose
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.jetpackcompose.authenticationform.Authentication
 import com.example.jetpackcompose.emailinbox.Inbox
-import com.example.jetpackcompose.messaging.Messaging
-import com.example.jetpackcompose.settings.Settings
 import com.example.jetpackcompose.ui.theme.JetpackComposeTheme
 
+@ExperimentalMaterialApi
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
