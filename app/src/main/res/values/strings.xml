@@ -54,5 +54,8 @@
     <string name="cd_close_conversation">Close conversation</string>
     <string name="title_chat">Group Chat</string>
     <string name="label_no_messages">No messages to display</string>
+    <string name="label_today">Today</string>
+    <string name="hint_send_message">Send a message…</string>
+    <string name="cd_send_message">Send message</string>
 
 </resources>
