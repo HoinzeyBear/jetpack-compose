@@ -10,16 +10,29 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import com.example.jetpackcompose.R
+import com.example.jetpackcompose.messaging.model.Contact
+import com.example.jetpackcompose.messaging.model.Mentions
+import com.example.jetpackcompose.shared.inputShouldTriggerSuggestions
+import com.example.jetpackcompose.shared.selectedWord
 
 @Composable
 fun InputBar(
     modifier: Modifier = Modifier,
-    sendMessage: (message: String) -> Unit
+    sendMessage: (message: String) -> Unit,
+    contacts: List<Contact>
 ) {
 
     var textState by remember { mutableStateOf(TextFieldValue()) }
+    val showMentions by derivedStateOf { textState.text.isNotEmpty()
+            && inputShouldTriggerSuggestions(contacts, selectedWord(textState))}
 
     Column(modifier = modifier) {
+        if(showMentions) {
+            Mentions(modifier = Modifier.fillMaxWidth(), contacts, selectedWord(textState)) { result ->
+
+            }
+        }
+
         Divider()
         TextField(modifier = Modifier.fillMaxWidth(),
             value = textState,

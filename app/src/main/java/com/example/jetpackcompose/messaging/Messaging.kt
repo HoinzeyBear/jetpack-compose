@@ -63,7 +63,8 @@ fun Conversation(modifier: Modifier = Modifier,
 
         InputBar(sendMessage = { message ->
             handleEvent(ConversationEvent.SendMessage(message))
-        })
+        },
+        contacts = state.contacts)
     }
 }
 
@@ -116,8 +117,7 @@ fun Messages(
 }
 
 fun groupMessagesByDate(
-    messages: List<Message>
-): Map<Calendar, List<Message>> {
+    messages: List<Message>): Map<Calendar, List<Message>> {
     return messages.groupBy {
         it.dateTime.apply {
             set(Calendar.HOUR_OF_DAY, 0)
@@ -129,8 +129,7 @@ fun groupMessagesByDate(
 }
 
 fun isToday(
-    calendar: Calendar
-): Boolean {
+    calendar: Calendar): Boolean {
     val today = Calendar.getInstance()
     return calendar.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
             calendar.get(Calendar.MONTH) == today.get(Calendar.MONTH) &&
