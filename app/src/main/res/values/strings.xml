@@ -58,5 +58,6 @@
     <string name="hint_send_message">Send a message…</string>
     <string name="cd_send_message">Send message</string>
     <string name="cd_mention_contact">Mention %s</string>
+    <string name="action_unsend_message">Unsend Message</string>
 
 </resources>

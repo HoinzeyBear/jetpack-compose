@@ -7,11 +7,18 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.TransformedText
+import androidx.compose.ui.text.input.VisualTransformation
 import com.example.jetpackcompose.R
 import com.example.jetpackcompose.messaging.model.Contact
 import com.example.jetpackcompose.messaging.model.Mentions
+import com.example.jetpackcompose.shared.buildAnnotatedStringWithColor
 import com.example.jetpackcompose.shared.inputShouldTriggerSuggestions
 import com.example.jetpackcompose.shared.selectedWord
 
@@ -28,14 +35,18 @@ fun InputBar(
 
     Column(modifier = modifier) {
         if(showMentions) {
-            Mentions(modifier = Modifier.fillMaxWidth(), contacts, selectedWord(textState)) { result ->
-
+            Mentions(modifier = Modifier.fillMaxWidth(), contacts, selectedWord(textState)) { query,result ->
+                val startIndex = textState.text.indexOf(query)
+                textState = textState.replaceText(
+                    startIndex,
+                    startIndex + query.length, result)
             }
         }
 
         Divider()
         TextField(modifier = Modifier.fillMaxWidth(),
             value = textState,
+            visualTransformation = MentionHighlightTransformation(MaterialTheme.colors.primary),
             onValueChange = { textState = it },
             placeholder = {
                 Text(
@@ -57,6 +68,27 @@ fun InputBar(
                 })
             }
         })
+    }
+}
+
+fun TextFieldValue.replaceText(
+    start: Int,
+    end: Int,
+    replaceWith: String): TextFieldValue {
+    val newText = this.text.replaceRange(
+        start,
+        end,
+        replaceWith
+    )
+    val endOfNewWord = start + replaceWith.length
+    val range = TextRange(endOfNewWord, endOfNewWord)
+    return this.copy(text = newText, selection = range)
+}
+
+class MentionHighlightTransformation(private val color: Color): VisualTransformation {
+    override fun filter(text: AnnotatedString): TransformedText {
+        return TransformedText(
+            buildAnnotatedStringWithColor(text.toString(), color), OffsetMapping.Identity)
     }
 }
 

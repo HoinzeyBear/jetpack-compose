@@ -19,7 +19,7 @@ fun Mentions(
     modifier: Modifier = Modifier,
     contacts: List<Contact>,
     query: String?,
-    onMentionClicked: (mention: String) -> Unit) {
+    onMentionClicked: (query: String,mention: String) -> Unit) {
 
     val mentions = contacts.filter {
         val withoutMentionSymbol = stripMentionSymbol(query?.lowercase())
@@ -33,7 +33,7 @@ fun Mentions(
                 Text(
                     modifier = Modifier
                         .clickable(onClickLabel = clickLabel) {
-                            onMentionClicked("@${contact.name}")
+                            onMentionClicked(query!! ,"@${contact.name}")
                         }
                         .padding(16.dp),
                     text = contact.name)

@@ -24,7 +24,10 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -32,6 +35,7 @@ import com.example.jetpackcompose.R
 import com.example.jetpackcompose.messaging.model.ConversationState
 import com.example.jetpackcompose.messaging.model.Message
 import com.example.jetpackcompose.messaging.model.MessageDirection
+import com.example.jetpackcompose.shared.buildAnnotatedStringWithColor
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -58,13 +62,18 @@ fun Conversation(modifier: Modifier = Modifier,
 
         Messages(
             modifier = Modifier.weight(1f),
-            messageList = state.messages
+            messageList = state.messages,
+            onMessageSelected = {handleEvent(ConversationEvent.SelectMessage(it))}
         )
 
         InputBar(sendMessage = { message ->
             handleEvent(ConversationEvent.SendMessage(message))
         },
         contacts = state.contacts)
+    }
+    if(state.selectedMessage != null) {
+        MessageActions(onDismiss = { handleEvent(ConversationEvent.UnselectMessage)},
+        onUnsendMessage = { handleEvent(ConversationEvent.UnsendMessage(state.selectedMessage.id)) })
     }
 }
 
@@ -83,47 +92,53 @@ fun Header(modifier: Modifier = Modifier, onClose: () -> Unit) {
 @Composable
 fun Messages(
     modifier: Modifier = Modifier,
-    messageList: List<Message>? = null) {
+    messageList: List<Message>? = null,
+    onMessageSelected: (messageId: String) -> Unit) {
 
     if(messageList.isNullOrEmpty()) {
         EmptyConversation()
     } else {
         val grouped = groupMessagesByDate(messageList)
+        val state = rememberLazyListState()
         LazyColumn(
+            reverseLayout = true,
             modifier = modifier,
-            state = rememberLazyListState(),
+            state = state,
             contentPadding = PaddingValues(top = 8.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)) {
 
             grouped.onEachIndexed { index, entry ->
+                items(entry.value) { message ->
+                    Message(
+                        modifier = Modifier.fillMaxWidth(),
+                        message = message,
+                        onLongPress = { onMessageSelected(it)} )
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+
                 stickyHeader {
                     MessageHeader(modifier = Modifier.fillMaxWidth(),
                         isToday = isToday(entry.key),
                         date = entry.key)
                 }
-
-                items(entry.value) { message ->
-                    Message(
-                        modifier = Modifier.fillMaxWidth(),
-                        message = message)
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
             }
-//            items(messageList) { next ->
-//                Message(modifier = modifier.fillMaxWidth(), message = next)
-//            }
+        }
+        LaunchedEffect(messageList) {
+            state.scrollToItem(0)
         }
     }
 }
 
 fun groupMessagesByDate(
     messages: List<Message>): Map<Calendar, List<Message>> {
-    return messages.groupBy {
-        it.dateTime.apply {
-            set(Calendar.HOUR_OF_DAY, 0)
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
+    return messages
+        .sortedByDescending { it.dateTime.timeInMillis }
+        .groupBy {
+            it.dateTime.apply {
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
         }
     }
 }
@@ -177,7 +192,8 @@ fun EmptyConversation(
 @Composable
 fun Message(
     modifier: Modifier = Modifier,
-    message: Message) {
+    message: Message,
+    onLongPress: (id: String) -> Unit) {
 
     val parentModifier = if (message.direction == MessageDirection.SENT) {
         modifier.padding(end = 16.dp)
@@ -192,6 +208,11 @@ fun Message(
     Column(modifier = parentModifier.pointerInput(Unit) {
         detectTapGestures(onTap = {
             displaySentTime = !displaySentTime
+        },
+        onLongPress = {
+            if(message.direction == MessageDirection.SENT) {
+                onLongPress(message.id)
+            }
         })
     }){
         Box(modifier = Modifier
@@ -221,7 +242,10 @@ fun MessageBody(
     if (message.message != null) {
         Text(
             modifier = modifier,
-            text = message.message
+            text = buildAnnotatedStringWithColor(
+                text = message.message,
+                color = MaterialTheme.colors.primary
+            )
         )
     } else if (message.image != null) {
         Image(modifier = modifier.size(120.dp),
