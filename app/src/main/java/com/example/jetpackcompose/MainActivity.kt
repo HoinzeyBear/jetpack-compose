@@ -5,9 +5,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.compose.ui.Modifier
+import com.example.jetpackcompose.homescreen.Home
 import com.example.jetpackcompose.messaging.Messaging
 import com.example.jetpackcompose.ui.theme.JetpackComposeTheme
 
@@ -25,7 +28,8 @@ class MainActivity : ComponentActivity() {
 //                    Settings()
 //                    Authentication()
 //                    Inbox()
-                    Messaging()
+//                    Messaging()
+                    Home(modifier = Modifier.fillMaxSize())
                 }
             }
         }
