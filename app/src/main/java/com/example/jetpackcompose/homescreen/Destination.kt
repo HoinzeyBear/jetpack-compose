@@ -1,9 +1,7 @@
 package com.example.jetpackcompose.homescreen
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.*
 import androidx.compose.ui.graphics.vector.ImageVector
 
 sealed class Destination(
@@ -16,13 +14,17 @@ sealed class Destination(
 
     object Contacts : Destination(
         "contacts",
-        Icons.Default.Person
-    )
+        Icons.Default.Person)
 
     object Calendar : Destination(
         "calendar",
-        Icons.Default.DateRange
-    )
+        Icons.Default.DateRange)
+
+    object Settings : Destination("settings",
+        Icons.Default.Settings)
+
+    object Upgrade : Destination("upgrade",
+        Icons.Default.Star)
 
     companion object {
         fun fromString(route: String): Destination {
@@ -30,6 +32,8 @@ sealed class Destination(
                 Feed.path -> Feed
                 Calendar.path -> Calendar
                 Contacts.path -> Contacts
+                Upgrade.path -> Upgrade
+                Settings.path -> Settings
                 else -> Home
             }
         }

@@ -64,5 +64,9 @@
     <string name="cd_create_item">Create a new item</string>
     <string name="cd_more_information">More information</string>
     <string name="not_available_yet">Not available yet</string>
+    <string name="label_name">Compose Academy</string>
+    <string name="home_label_email">contact@compose.academy</string>
+    <string name="log_out">Log Out</string>
+    <string name="cd_open_menu">Open Menu</string>
 
 </resources>

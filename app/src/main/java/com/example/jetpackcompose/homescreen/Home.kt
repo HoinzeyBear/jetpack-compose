@@ -5,6 +5,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -24,8 +25,9 @@ import kotlinx.coroutines.launch
 @Composable
 fun Home(modifier: Modifier = Modifier) {
 
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
-    val scaffoldState = rememberScaffoldState()
+    val scaffoldState = rememberScaffoldState(drawerState)
     val navController = rememberNavController()
     val navBackStackEntry = navController.currentBackStackEntryAsState()
     val currentDestination by derivedStateOf {
@@ -56,6 +58,19 @@ fun Home(modifier: Modifier = Modifier) {
                         contentDescription = stringResource(id = R.string.cd_more_information))
                     }
                 }
+            },
+            navigationIcon = {
+                IconButton(onClick = {
+                    coroutineScope.launch {
+                        drawerState.open()
+                    }
+                }){
+                    Icon(
+                        imageVector = Icons.Default.Menu,
+                        contentDescription = stringResource(
+                            id = R.string.cd_open_menu)
+                    )
+                }
             })
         },
         floatingActionButton = {
@@ -77,6 +92,14 @@ fun Home(modifier: Modifier = Modifier) {
                         restoreState = true
                     }
                 })
+        },
+        drawerContent = {
+            DrawerContent(modifier = Modifier.fillMaxWidth(),
+            onNavigationSelected = {
+                navController.navigate(it.path)
+                coroutineScope.launch { drawerState.close() }
+            },
+            onLogout = {})
         }) {
         //Scaffold body
         Navigation(modifier = modifier, navController = navController)
