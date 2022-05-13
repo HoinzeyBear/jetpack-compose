@@ -68,5 +68,6 @@
     <string name="home_label_email">contact@compose.academy</string>
     <string name="log_out">Log Out</string>
     <string name="cd_open_menu">Open Menu</string>
+    <string name="cd_navigate_up">Go back</string>
 
 </resources>

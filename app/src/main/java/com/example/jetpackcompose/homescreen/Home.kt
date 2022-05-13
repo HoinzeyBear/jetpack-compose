@@ -41,37 +41,18 @@ fun Home(modifier: Modifier = Modifier) {
         Scaffold(modifier = modifier,
         scaffoldState = scaffoldState,
         topBar = {
-            val snackbarMessage = stringResource(
-                id = R.string.not_available_yet)
-            TopAppBar(
-                title = {
-                    Text(text = "Home")
+            DestinationTopBar(
+                destination = currentDestination,
+                onNavigateUp = { navController.popBackStack() },
+                onOpenDrawer = {
+                    coroutineScope.launch { drawerState.open() }
                 },
-            actions = {
-                if(currentDestination != Destination.Feed) {
-                    IconButton(onClick = {
-                        coroutineScope.launch {
-                            scaffoldState.snackbarHostState.showSnackbar(snackbarMessage)
-                        }
-                    }){
-                        Icon(imageVector = Icons.Default.Info,
-                        contentDescription = stringResource(id = R.string.cd_more_information))
-                    }
-                }
-            },
-            navigationIcon = {
-                IconButton(onClick = {
+                showSnackbar = {
                     coroutineScope.launch {
-                        drawerState.open()
+                        scaffoldState.snackbarHostState.showSnackbar(it)
                     }
-                }){
-                    Icon(
-                        imageVector = Icons.Default.Menu,
-                        contentDescription = stringResource(
-                            id = R.string.cd_open_menu)
-                    )
                 }
-            })
+            )
         },
         floatingActionButton = {
             FloatingActionButton(onClick = {}) {

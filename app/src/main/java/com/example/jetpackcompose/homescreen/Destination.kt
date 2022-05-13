@@ -6,7 +6,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 
 sealed class Destination(
     val path: String,
-    val icon: ImageVector? = null) {
+    val icon: ImageVector? = null,
+    val isRootDestination: Boolean = true) {
 
     object Home: Destination("home")
 
@@ -21,10 +22,12 @@ sealed class Destination(
         Icons.Default.DateRange)
 
     object Settings : Destination("settings",
-        Icons.Default.Settings)
+        Icons.Default.Settings,
+        isRootDestination = false)
 
     object Upgrade : Destination("upgrade",
-        Icons.Default.Star)
+        Icons.Default.Star,
+        isRootDestination = false)
 
     companion object {
         fun fromString(route: String): Destination {
