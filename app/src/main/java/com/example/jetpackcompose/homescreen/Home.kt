@@ -1,5 +1,6 @@
 package com.example.jetpackcompose.homescreen
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -16,14 +17,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.jetpackcompose.R
 import kotlinx.coroutines.launch
 
 @Composable
-fun Home(modifier: Modifier = Modifier) {
+fun Home(modifier: Modifier = Modifier,
+         orientation: Int) {
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
@@ -55,24 +59,33 @@ fun Home(modifier: Modifier = Modifier) {
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = {}) {
-                //Fab body
-                Icon(imageVector = Icons.Default.Add,
-                contentDescription = stringResource(R.string.cd_create_item))
+//            if (orientation != Configuration.ORIENTATION_LANDSCAPE &&
+//                Destination.Feed.path == navController.currentDestination?.route) {
+            if(orientation != Configuration.ORIENTATION_LANDSCAPE &&
+                currentDestination == Destination.Feed){
+                FloatingActionButton(onClick = {
+                    navController.navigate(Destination.Creation)
+                }) {
+                    Icon(imageVector = Icons.Default.Add,
+                        contentDescription = stringResource(R.string.cd_create_item))
+                }
             }
         },
         bottomBar = {
-            BottomNavigationBar(
-                currentDestination = currentDestination,
-                onNavigate = {
-                    navController.navigate(it.path) {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
+            if (currentDestination.isRootDestination &&
+                orientation != Configuration.ORIENTATION_LANDSCAPE) {
+                BottomNavigationBar(
+                    currentDestination = currentDestination,
+                    onNavigate = {
+                        navController.navigate(it.path) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
                         }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                })
+                    })
+            }
         },
         drawerContent = {
             DrawerContent(modifier = Modifier.fillMaxWidth(),
@@ -82,15 +95,62 @@ fun Home(modifier: Modifier = Modifier) {
             },
             onLogout = {})
         }) {
-        //Scaffold body
-        Navigation(modifier = modifier, navController = navController)
+
+            Body(
+                modifier = Modifier.fillMaxSize(),
+                destination = currentDestination,
+                orientation = orientation,
+                navController = navController,
+                onCreateItem = {
+                    navController.navigate(Destination.Add.path)
+                },
+                onNavigate = {
+                    navController.navigate(it.path) {
+                        popUpTo(Destination.Home.path) {
+                            saveState = true
+                        }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+            )
+
+        }
+}
+
+@Composable
+fun Body(
+    modifier: Modifier = Modifier,
+    navController: NavHostController,
+    destination: Destination,
+    orientation: Int,
+    onCreateItem: () -> Unit,
+    onNavigate: (destination: Destination) -> Unit
+) {
+    Row(modifier = modifier) {
+        if (destination.isRootDestination &&
+            orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            RailNavigationBar(
+                currentDestination = destination,
+                onCreateItem = onCreateItem,
+                onNavigate = onNavigate
+            )
+        }
+        Navigation(
+            modifier = Modifier.fillMaxSize(),
+            navController = navController)
     }
+}
+
+fun NavController.navigate(destination: Destination) {
+    navigate(destination.path)
 }
 
 @Preview
 @Composable
 fun HomePreview() {
     MaterialTheme {
-        Home(modifier = Modifier.fillMaxSize())
+        Home(modifier = Modifier.fillMaxSize(),
+            Configuration.ORIENTATION_PORTRAIT)
     }
 }

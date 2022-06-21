@@ -38,17 +38,17 @@ fun Navigation(
             ContentArea(Modifier.fillMaxSize(), destination = Destination.Upgrade)
         }
 
-//        navigation(
-//            startDestination = Destination.Add.path,
-//            route = Destination.Creation.path
-//        ) {
-//            composable(route = Destination.Add.path) {
-//                ContentArea(
-//                    modifier = Modifier.fillMaxSize(),
-//                    destination = Destination.Add
-//                )
-//            }
-//        }
+        navigation(
+            startDestination = Destination.Add.path,
+            route = Destination.Creation.path
+        ) {
+            composable(route = Destination.Add.path) {
+                ContentArea(
+                    modifier = Modifier.fillMaxSize(),
+                    destination = Destination.Add
+                )
+            }
+        }
     }
 }
 

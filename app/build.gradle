@@ -11,7 +11,7 @@ android {
         exclude "META-INF/licenses/ASM"
     }
 
-    compileSdk 31
+    compileSdk 32
 
     defaultConfig {
         applicationId "com.example.jetpackcompose"
@@ -45,7 +45,7 @@ android {
     }
     composeOptions {
         kotlinCompilerExtensionVersion compose_version
-        kotlinCompilerVersion '1.5.21'
+        kotlinCompilerVersion '1.6.10'
     }
     packagingOptions {
         resources {
@@ -56,25 +56,25 @@ android {
 
 dependencies {
 
-    implementation 'androidx.core:core-ktx:1.7.0'
-    implementation 'androidx.appcompat:appcompat:1.4.0'
-    implementation 'com.google.android.material:material:1.4.0'
+    implementation 'androidx.core:core-ktx:1.8.0'
+    implementation 'androidx.appcompat:appcompat:1.4.2'
+    implementation 'com.google.android.material:material:1.6.1'
     implementation "androidx.compose.ui:ui:$compose_version"
     implementation "androidx.compose.material:material:$compose_version"
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.4.0'
-    implementation 'androidx.activity:activity-compose:1.3.0-alpha06'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.4.1'
+    implementation 'androidx.activity:activity-compose:1.6.0-alpha05'
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
-    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.4.0"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.4.1"
 
     // provides access to the `ComponentActivity` class that can be used to compose UI components
     implementation 'androidx.activity:activity-compose:1.4.0'
     // provide functionality for accessing viewmodels within composable functions
-    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.4.0"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.4.1"
     // foundational classes from the Compose APIs
     implementation"androidx.compose.foundation:foundation:$compose_version"
     // UI components from the Compose APIs
@@ -84,7 +84,7 @@ dependencies {
     // Tooling functionality for Composables, such as previews
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
     //navigation
-    implementation "androidx.navigation:navigation-compose:2.4.0-beta02"
+    implementation "androidx.navigation:navigation-compose:2.5.0-rc02"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:$compose_version")
     debugImplementation("androidx.compose.ui:ui-test-manifest:$compose_version")

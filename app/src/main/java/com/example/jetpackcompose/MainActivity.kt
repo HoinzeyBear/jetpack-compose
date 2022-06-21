@@ -10,6 +10,8 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import com.example.jetpackcompose.authenticationform.Authentication
 import com.example.jetpackcompose.homescreen.Home
 import com.example.jetpackcompose.messaging.Messaging
 import com.example.jetpackcompose.ui.theme.JetpackComposeTheme
@@ -29,7 +31,8 @@ class MainActivity : ComponentActivity() {
 //                    Authentication()
 //                    Inbox()
 //                    Messaging()
-                    Home(modifier = Modifier.fillMaxSize())
+                    Home(modifier = Modifier.fillMaxSize(),
+                        orientation = LocalConfiguration.current.orientation)
                 }
             }
         }

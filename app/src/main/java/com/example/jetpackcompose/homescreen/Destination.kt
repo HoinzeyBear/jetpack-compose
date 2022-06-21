@@ -29,6 +29,13 @@ sealed class Destination(
         Icons.Default.Star,
         isRootDestination = false)
 
+    object Creation: Destination("creation",
+        isRootDestination = false)
+
+    object Add: Destination("add",
+        icon = Icons.Default.Add,
+        isRootDestination = false)
+
     companion object {
         fun fromString(route: String): Destination {
             return when(route) {
@@ -37,6 +44,8 @@ sealed class Destination(
                 Contacts.path -> Contacts
                 Upgrade.path -> Upgrade
                 Settings.path -> Settings
+                Add.path -> Add
+                Creation.path -> Creation
                 else -> Home
             }
         }
