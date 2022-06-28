@@ -1,14 +1,13 @@
 package com.example.jetpackcompose.homescreen
 
-import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithContentDescription
-import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
 import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.Rule
 import org.junit.Test
 import com.example.jetpackcompose.R
+import com.example.jetpackcompose.shared.Tags
+import com.example.jetpackcompose.shared.Tags.TAG_ROOT_TOP_BAR
 import org.mockito.Mockito.verify
 import org.mockito.kotlin.mock
 
@@ -149,5 +148,62 @@ class TopBarTests {
             InstrumentationRegistry.getInstrumentation().context
                 .getString(R.string.not_available_yet)
         )
+    }
+
+    @Test
+    fun Root_Destination_Top_Bar_Displayed() {
+        composeTestRule.setContent {
+            RootDestinationTopBar(
+                currentDestination = Destination.Home,
+                openDrawer = { },
+                showSnackbar = { })
+        }
+        composeTestRule
+            .onNodeWithTag(TAG_ROOT_TOP_BAR)
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun DestinationTopBarTop_Bar_Never_Displayed() {
+        composeTestRule.setContent {
+            DestinationTopBar(
+                destination = Destination.Home,
+                onNavigateUp = { },
+                onOpenDrawer = { },
+                showSnackbar = { }
+            )
+        }
+        composeTestRule.onNodeWithTag(
+            TAG_ROOT_TOP_BAR
+        ).assertDoesNotExist()
+    }
+
+    @Test
+    fun DestinationTopBarTop_Bar_Displayed() {
+        composeTestRule.setContent {
+            DestinationTopBar(
+                destination = Destination.Add,
+                onNavigateUp = { },
+                onOpenDrawer = { },
+                showSnackbar = { })
+        }
+        composeTestRule.onNodeWithTag(
+            Tags.TAG_CHILD_TOP_BAR
+        ).assertIsDisplayed()
+    }
+
+    @Test
+    fun DestinationTopBarRoot_Destination_Top_Bar_Never_Displayed() {
+        composeTestRule.setContent {
+            DestinationTopBar(
+                destination = Destination.Add,
+                onNavigateUp = { },
+                onOpenDrawer = { },
+                showSnackbar = { }
+            )
+        }
+        composeTestRule.onNodeWithTag(
+            TAG_ROOT_TOP_BAR
+        ).assertDoesNotExist()
     }
 }

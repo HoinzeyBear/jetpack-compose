@@ -10,8 +10,10 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import com.example.jetpackcompose.R
+import com.example.jetpackcompose.shared.Tags
 
 @Composable
 fun DestinationTopBar(
@@ -39,7 +41,7 @@ fun DestinationTopBar(
 
 @Composable
 fun RootDestinationTopBar(
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier.testTag(Tags.TAG_ROOT_TOP_BAR),
     currentDestination: Destination,
     openDrawer: () -> Unit,
     showSnackbar: (message: String) -> Unit) {
@@ -77,7 +79,7 @@ fun RootDestinationTopBar(
 
 @Composable
 fun ChildDestinationTopBar(
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier.testTag(Tags.TAG_CHILD_TOP_BAR),
     title: String,
     onNavigateUp: () -> Unit) {
     TopAppBar(
