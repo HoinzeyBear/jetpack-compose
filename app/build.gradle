@@ -90,4 +90,8 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-test-manifest:$compose_version")
     androidTestImplementation("org.mockito.kotlin:mockito-kotlin:3.2.0")
     androidTestImplementation("org.mockito:mockito-android:3.12.4")
+    // Provides us with utilities for requesting permissions
+    implementation 'com.google.accompanist:accompanist-permissions:0.22.0-rc'
+    // Provides image loading utilies
+    implementation 'io.coil-kt:coil-compose:1.4.0'
 }
